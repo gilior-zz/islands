@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>islands</title>
+    <script src="index.js"></script>
+    <style>
+        span {
+            /*height: 5px;*/
+            /*height: 5px;*/
+            border-width: thin;
+            border-color: black;
+            border-style: solid;
+            /*content: "•"; !* Insert content that looks like bullets *!*/
+            color: transparent;
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none;
+            /* Non-prefixed version, currently
+                                             supported by Chrome and Opera */
+        }
+
+        #container {
+            width: 80vw;
+            padding: 20px;
+            overflow: scroll;
+            height: 80vh;
+            margin: auto;
+        }
+
+        section {
+            display: inline;
+            font-size: 16px;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        input[type=button] {
+            font-size: 16px;
+            background: lightcyan;
+        }
+
+        input[type=number] {
+            width: 100px;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body id="body">
+
+<input type="number" id="rows" value="500" type="text"> rows
+&nbsp;
+&nbsp;
+&nbsp;
+<input type="number" id="cols" value="500" type="text"> cols
+&nbsp;
+&nbsp;
+&nbsp;
+<input value="RANDOMIZE" onclick="foo.load()" type="button">
+&nbsp;
+&nbsp;
+&nbsp;
+<input value="SOLVE" onclick="foo.caclIslands()" type="button">
+&nbsp;
+&nbsp;
+&nbsp;
+<section>number of islands:</section>
+&nbsp;
+<section id="islands_num_place_holder"></section>
+
+<div id="container">
+
+</div>
+
+</body>
+</html>
