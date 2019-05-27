@@ -1,13 +1,16 @@
 "use strict";
-var Foo = /** @class */ (function () {
-    function Foo() {
+var Manager = /** @class */ (function () {
+    function Manager() {
     }
-    Foo.prototype.load = function () {
+    Manager.prototype.load = function () {
         document.getElementById('islands_num_place_holder').innerText = '0';
+        var counter = 0;
         this.arr = null;
         var rows = document.getElementById('rows');
         var cols = document.getElementById('cols');
         var container = document.getElementById('container');
+        // var tblContainer = document.getElementById('tbl-container') as HTMLDivElement;
+        // tblContainer.innerHTML = '';
         container.innerHTML = '';
         this.arr = new Array(+rows.value);
         for (var i = 0; i < +rows.value; i++) {
@@ -16,37 +19,25 @@ var Foo = /** @class */ (function () {
             for (var j = 0; j < +cols.value; j++) {
                 var span = document.createElement('span');
                 var num = Math.floor(Math.random() * 10) + 1;
-                this.arr[i][j] = num > 8 ? 1 : 0;
+                if (num > 8) { // is black
+                    var minNeighbor = this.scanPreviousNeighbors(i, j);
+                    this.arr[i][j] = 1;
+                    // (<HTMLSpanElement>span).style.backgroundColor = 'black';
+                }
+                else {
+                    this.arr[i][j] = 0;
+                    // (<HTMLSpanElement>span).style.backgroundColor = 'white';
+                }
                 span.innerText = this.arr[i][j].toString();
-                span.style.backgroundColor = num > 8 ? 'black' : 'white';
                 div.appendChild(span);
-                span.setAttribute('id', this.getID(i, j));
             }
             container.appendChild(div);
         }
-        // for (var i = 0; i < this.arr.length; i++) {
-        //     var div = document.createElement('div');
-        //     for (var j = 0; j < this.arr[i].length; j++) {
-        //         var span = document.createElement('span');
-        //         span.innerText = this.arr[i][j].toString();
-        //         var is_one = this.arr[i][j]==1;
-        //         if (is_one)
-        //             (<HTMLSpanElement>span).style.backgroundColor = 'black';
-        //         else
-        //             (<HTMLSpanElement>span).style.backgroundColor = 'white';
-        //
-        //
-        //
-        //         div.appendChild(span);
-        //         span.setAttribute('id', this.getID(i, j))
-        //     }
-        //     container.appendChild(div)
-        // }
     };
-    Foo.prototype.isVisited = function (i, j) {
+    Manager.prototype.isVisited = function (i, j) {
         return this.isInBounds(i, j) && this.visited_arr[i][j] == -1;
     };
-    Foo.prototype.caclIslands = function () {
+    Manager.prototype.caclIslands = function () {
         var islands_num_place_holder = 0;
         if (!this.arr || this.arr.length === 0)
             return;
@@ -64,7 +55,7 @@ var Foo = /** @class */ (function () {
             }
         }
     };
-    Foo.prototype.getRandomColor = function () {
+    Manager.prototype.getRandomColor = function () {
         var letters = '0123456789ABCDEF';
         var color = '#';
         for (var i = 0; i < 6; i++) {
@@ -72,25 +63,25 @@ var Foo = /** @class */ (function () {
         }
         return color;
     };
-    Foo.prototype.setColor = function (i, j, color) {
+    Manager.prototype.setColor = function (i, j, color) {
         var cell = this.getTableCell(i, j);
         cell.style.backgroundColor = color;
     };
-    Foo.prototype.getTableCell = function (i, j) {
+    Manager.prototype.getTableCell = function (i, j) {
         return document.getElementById(this.getID(i, j));
     };
-    Foo.prototype.setVisited = function (i, j) {
+    Manager.prototype.setVisited = function (i, j) {
         this.visited_arr[i][j] = -1;
     };
-    Foo.prototype.getID = function (i, j) {
+    Manager.prototype.getID = function (i, j) {
         return i.toString() + ',' + j.toString();
     };
-    Foo.prototype.markIsland = function (i, j) {
+    Manager.prototype.markIsland = function (i, j) {
         var rndColor = this.getRandomColor();
         this.setColor(i, j, rndColor);
         this.markNeighbors(rndColor, i, j);
     };
-    Foo.prototype.markNeighbors = function (color, i, j) {
+    Manager.prototype.markNeighbors = function (color, i, j) {
         var _this = this;
         var neighbors = this.getRelevantNeighbors(i, j);
         neighbors.forEach(function (item) {
@@ -98,7 +89,7 @@ var Foo = /** @class */ (function () {
             _this.markNeighbors(color, item.x, item.y);
         });
     };
-    Foo.prototype.getRelevantNeighbors = function (i, j) {
+    Manager.prototype.getRelevantNeighbors = function (i, j) {
         var x, y;
         var arr = new Array();
         x = i - 1;
@@ -135,7 +126,7 @@ var Foo = /** @class */ (function () {
         this.handleCell(x, y, arr);
         return arr;
     };
-    Foo.prototype.handleCell = function (x, y, arr) {
+    Manager.prototype.handleCell = function (x, y, arr) {
         if (!this.isVisited(x, y))
             if (this.isInBounds(x, y)) {
                 this.setVisited(x, y);
@@ -143,9 +134,25 @@ var Foo = /** @class */ (function () {
                     arr.push({ x: x, y: y });
             }
     };
-    Foo.prototype.isInBounds = function (i, j) {
+    Manager.prototype.isInBounds = function (i, j) {
         return i > -1 && j > -1 && i < this.arr.length && j < this.arr[0].length;
     };
-    return Foo;
+    Manager.prototype.scanPreviousNeighbors = function (i, j) {
+        //up left
+        var up_left = -1;
+        var up_right = -1;
+        var up = -1;
+        var left = -1;
+        if (i >= 1) {
+            up_left = this.arr[i - 1][j - 1];
+            up = this.arr[i - 1][j];
+            up_right = this.arr[i - 1][j + 1];
+        }
+        if (j >= 1)
+            left = this.arr[i][j - 1];
+        var min = Math.min(up, up_left, up_right, left);
+        return min;
+    };
+    return Manager;
 }());
-var foo = new Foo();
+var manager = new Manager();
