@@ -22,23 +22,32 @@ var Manager = /** @class */ (function () {
         var container = document.getElementById('container');
         container.innerHTML = '';
         this.arr = new Array(+rows.value);
-        for (var i = 0; i < +rows.value; i++) {
+        this.build_model_layout(rows, cols);
+        this.build_mat_layout(container);
+    };
+    Manager.prototype.build_mat_layout = function (container) {
+        for (var i = 0; i < this.arr.length; i++) {
             var div = document.createElement('div');
-            this.arr[i] = new Array(+cols.value);
-            for (var j = 0; j < +cols.value; j++) {
+            for (var j = 0; j < this.arr[i].length; j++) {
                 var span = document.createElement('span');
-                var num = Math.floor(Math.random() * 10) + 1;
-                this.arr[i][j] = num > 8 ? 1 : 0;
-                span.innerText = this.arr[i][j].toString();
-                span.style.backgroundColor = num > 8 ? 'black' : 'white';
+                var num = this.arr[i][j];
+                span.innerText = num.toString();
+                if (num)
+                    span.style.backgroundColor = 'black';
                 div.appendChild(span);
                 span.setAttribute('id', this.getID(i, j));
             }
             container.appendChild(div);
         }
     };
-    Manager.prototype.isVisited = function (i, j) {
-        return this.isInBounds(i, j) && this.cloned[i][j] == -1;
+    Manager.prototype.build_model_layout = function (rows, cols) {
+        for (var i = 0; i < +rows.value; i++) {
+            this.arr[i] = new Array(+cols.value);
+            for (var j = 0; j < +cols.value; j++) {
+                var num = Math.floor(Math.random() * 10) + 1;
+                this.arr[i][j] = num > 8 ? 1 : 0;
+            }
+        }
     };
     Manager.prototype.caclIslands = function () {
         var islands_num_place_holder = 0;
@@ -46,28 +55,34 @@ var Manager = /** @class */ (function () {
         if (!this.arr || this.arr.length === 0)
             return;
         this.cloned = JSON.parse(JSON.stringify(this.arr));
-        //1st scan
-        for (var i = 0; i < this.arr.length; i++) {
-            for (var j = 0; j < this.arr[i].length; j++) {
-                if (this.getUnitValue(i, j) == 1) {
-                    var arr = [];
-                    arr.push(this.getLocationValue(i, j, MyLocation.UpLeft));
-                    arr.push(this.getLocationValue(i, j, MyLocation.Up));
-                    arr.push(this.getLocationValue(i, j, MyLocation.UpRight));
-                    arr.push(this.getLocationValue(i, j, MyLocation.Left));
-                    var min = Math.min.apply(Math, arr);
-                    if (min == Number.MAX_VALUE) { //we have new island
-                        this.counter++;
-                        this.cloned[i][j] = this.counter;
-                        // islands_num_place_holder++;
+        this.scan_forward();
+        this.scan_backward();
+        //set colors
+        islands_num_place_holder = this.set_colors(islands_num_place_holder);
+        document.getElementById('islands_num_place_holder').innerText = islands_num_place_holder.toString();
+    };
+    Manager.prototype.set_colors = function (islands_num_place_holder) {
+        var island_colors_dic = {};
+        for (var i_1 = 0; i_1 < this.cloned.length; i_1++) {
+            for (var j = 0; j < this.cloned[i_1].length; j++) {
+                var value = this.cloned[i_1][j];
+                if (value >= 1) { //found island
+                    {
+                        if (value in island_colors_dic) { // part of ongoing island
+                            this.setColor(i_1, j, island_colors_dic[value]);
+                        }
+                        else { //new island to paint
+                            island_colors_dic[value] = this.getRandomColor();
+                            this.setColor(i_1, j, island_colors_dic[value]);
+                            islands_num_place_holder++;
+                        }
                     }
-                    else
-                        this.cloned[i][j] = min;
                 }
             }
         }
-        console.log('b4', JSON.parse(JSON.stringify(this.cloned)));
-        //2nd scan
+        return islands_num_place_holder;
+    };
+    Manager.prototype.scan_backward = function () {
         for (var i = this.arr.length - 1; i > -1; i--) {
             for (var j = this.arr[i].length - 1; j > -1; j--) {
                 if (this.getUnitValue(i, j) >= 1) {
@@ -91,28 +106,32 @@ var Manager = /** @class */ (function () {
                 }
             }
         }
-        console.log('after', JSON.parse(JSON.stringify(this.cloned)));
-        // document.getElementById('islands_num_place_holder').innerText = islands_num_place_holder.toString();
-        // 3rd scan
-        var island_colors_dic = {};
-        for (var i_1 = 0; i_1 < this.cloned.length; i_1++) {
-            for (var j_1 = 0; j_1 < this.cloned[i_1].length; j_1++) {
-                var value = this.cloned[i_1][j_1];
-                if (value >= 1) { //found island
-                    {
-                        if (value in island_colors_dic) { // part of ongoing island
-                            this.setColor(i_1, j_1, island_colors_dic[value]);
-                        }
-                        else { //new island to paint
-                            island_colors_dic[value] = this.getRandomColor();
-                            this.setColor(i_1, j_1, island_colors_dic[value]);
-                            islands_num_place_holder++;
-                        }
+    };
+    Manager.prototype.scan_forward = function () {
+        for (var i = 0; i < this.arr.length; i++) {
+            for (var j = 0; j < this.arr[i].length; j++) {
+                if (this.getUnitValue(i, j) == 1) {
+                    var arr = [];
+                    arr.push(this.getLocationValue(i, j, MyLocation.UpLeft));
+                    arr.push(this.getLocationValue(i, j, MyLocation.Up));
+                    arr.push(this.getLocationValue(i, j, MyLocation.UpRight));
+                    arr.push(this.getLocationValue(i, j, MyLocation.Left));
+                    var min = Math.min.apply(Math, arr);
+                    if (min == Number.MAX_VALUE) { //we have new island
+                        this.counter++;
+                        this.cloned[i][j] = this.counter;
+                        // islands_num_place_holder++;
+                    }
+                    else {
+                        this.setLocationValue(i, j, MyLocation.Self, min);
+                        this.setLocationValue(i, j, MyLocation.UpLeft, min);
+                        this.setLocationValue(i, j, MyLocation.Up, min);
+                        this.setLocationValue(i, j, MyLocation.UpRight, min);
+                        this.setLocationValue(i, j, MyLocation.Left, min);
                     }
                 }
             }
         }
-        document.getElementById('islands_num_place_holder').innerText = islands_num_place_holder.toString();
     };
     Manager.prototype.setUnitValue = function (i, j, value) {
         if (i < 0 || j < 0 || i >= this.arr.length || j >= this.arr[0].length || this.cloned[i][j] === 0)
@@ -186,78 +205,14 @@ var Manager = /** @class */ (function () {
         return color;
     };
     Manager.prototype.setColor = function (i, j, color) {
-        var cell = this.getTableCell(i, j);
+        var cell = this.getSpan(i, j);
         cell.style.backgroundColor = color;
     };
-    Manager.prototype.getTableCell = function (i, j) {
+    Manager.prototype.getSpan = function (i, j) {
         return document.getElementById(this.getID(i, j));
-    };
-    Manager.prototype.setVisited = function (i, j) {
-        this.cloned[i][j] = -1;
     };
     Manager.prototype.getID = function (i, j) {
         return i.toString() + ',' + j.toString();
-    };
-    Manager.prototype.markIsland = function (i, j) {
-        var rndColor = this.getRandomColor();
-        this.setColor(i, j, rndColor);
-        this.markNeighbors(rndColor, i, j);
-    };
-    Manager.prototype.markNeighbors = function (color, i, j) {
-        var _this = this;
-        var neighbors = this.getRelevantNeighbors(i, j);
-        neighbors.forEach(function (item) {
-            _this.setColor(item.x, item.y, color);
-            _this.markNeighbors(color, item.x, item.y);
-        });
-    };
-    Manager.prototype.getRelevantNeighbors = function (i, j) {
-        var x, y;
-        var arr = new Array();
-        x = i - 1;
-        y = j - 1;
-        // let leftUp: { x: number, y: number } = {x, y};
-        this.handleCell(x, y, arr);
-        x = i - 1;
-        y = j;
-        // let up: { x: number, y: number } = {x, y};
-        this.handleCell(x, y, arr);
-        x = i - 1;
-        y = j + 1;
-        // let rightUp: { x: number, y: number } = {x, y};
-        this.handleCell(x, y, arr);
-        x = i + 1;
-        y = j - 1;
-        // let leftDown: { x: number, y: number } = {x, y};
-        this.handleCell(x, y, arr);
-        x = i + 1;
-        y = j;
-        // let down: { x: number, y: number } = {x: i + 1, y: j};
-        this.handleCell(x, y, arr);
-        x = i + 1;
-        y = j + 1;
-        // let rightDown: { x: number, y: number } = {x, y};
-        this.handleCell(x, y, arr);
-        x = i;
-        y = j + 1;
-        // let right: { x: number, y: number } = {x, y};
-        this.handleCell(x, y, arr);
-        x = i;
-        y = j - 1;
-        // let left: { x: number, y: number } = {x, y};
-        this.handleCell(x, y, arr);
-        return arr;
-    };
-    Manager.prototype.handleCell = function (x, y, arr) {
-        if (!this.isVisited(x, y))
-            if (this.isInBounds(x, y)) {
-                this.setVisited(x, y);
-                if (this.arr[x][y] == 1)
-                    arr.push({ x: x, y: y });
-            }
-    };
-    Manager.prototype.isInBounds = function (i, j) {
-        return i > -1 && j > -1 && i < this.arr.length && j < this.arr[0].length;
     };
     return Manager;
 }());
