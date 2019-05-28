@@ -3,7 +3,7 @@ class Foo {
     private visited_arr;
 
     load() {
-        document.getElementById('islands_num_place_holder').innerText='0';
+        document.getElementById('islands_num_place_holder').innerText = '0';
 
         this.arr = null;
         var rows = document.getElementById('rows') as HTMLInputElement;
@@ -21,33 +21,12 @@ class Foo {
                 var num = Math.floor(Math.random() * 10) + 1;
                 this.arr[i][j] = num > 8 ? 1 : 0;
                 span.innerText = this.arr[i][j].toString();
-                (<HTMLSpanElement>span).style.backgroundColor=num > 8 ? 'black' : 'white'
+                (<HTMLSpanElement>span).style.backgroundColor = num > 8 ? 'black' : 'white'
                 div.appendChild(span);
                 span.setAttribute('id', this.getID(i, j))
             }
             container.appendChild(div)
         }
-
-
-        // for (var i = 0; i < this.arr.length; i++) {
-        //     var div = document.createElement('div');
-        //     for (var j = 0; j < this.arr[i].length; j++) {
-        //         var span = document.createElement('span');
-        //         span.innerText = this.arr[i][j].toString();
-        //         var is_one = this.arr[i][j]==1;
-        //         if (is_one)
-        //             (<HTMLSpanElement>span).style.backgroundColor = 'black';
-        //         else
-        //             (<HTMLSpanElement>span).style.backgroundColor = 'white';
-        //
-        //
-        //
-        //         div.appendChild(span);
-        //         span.setAttribute('id', this.getID(i, j))
-        //     }
-        //     container.appendChild(div)
-        // }
-
     }
 
     isVisited(i, j): boolean {
@@ -55,19 +34,17 @@ class Foo {
     }
 
     caclIslands() {
-        var islands_num_place_holder=0;
+        var islands_num_place_holder = 0;
 
         if (!this.arr || this.arr.length === 0) return;
         this.visited_arr = JSON.parse(JSON.stringify(this.arr));
-
         for (var i = 0; i < this.arr.length; i++) {
             for (var j = 0; j < this.arr[i].length; j++) {
                 if (this.visited_arr[i][j] != -1) {
                     this.setVisited(i, j);
-                    if (this.arr[i][j] == 1)
-                    {
+                    if (this.arr[i][j] == 1) {
                         islands_num_place_holder++;
-                        document.getElementById('islands_num_place_holder').innerText=islands_num_place_holder.toString();
+                        document.getElementById('islands_num_place_holder').innerText = islands_num_place_holder.toString();
                         this.markIsland(i, j,);
                     }
 

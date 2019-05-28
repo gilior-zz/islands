@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>islands</title>
-    <script src="Unit.js"></script>
+    <!--<script src="Unit.js"></script>-->
+    <!--<script src="index.js"></script>-->
     <script src="index.js"></script>
+    <script src="index_2.js"></script>
     <!--<script src="index.js"></script>-->
     <style>
         span {
@@ -63,19 +65,21 @@
 </head>
 <body id="body">
 
-<input type="number" id="rows" value="5" type="text"> rows
+<input type="number" id="rows" value="10" type="text"> rows
 &nbsp;
 &nbsp;
 &nbsp;
-<input type="number" id="cols" value="5" type="text"> cols
+<input type="number" id="cols" value="10" type="text"> cols
 &nbsp;
 &nbsp;
 &nbsp;
-<input value="RANDOMIZE" onclick="foo.load()" type="button">
+<input value="RANDOMIZE" onclick="manager.load()" type="button">
+<input value="RANDOMIZE_OLD" onclick="foo.load()" type="button">
 &nbsp;
 &nbsp;
 &nbsp;
-<input value="SOLVE" onclick="foo.caclIslands()" type="button">
+<input value="SOLVE" onclick="manager.caclIslands()" type="button">
+<input value="SOLVE_OLD" onclick="foo.caclIslands()" type="button">
 &nbsp;
 &nbsp;
 &nbsp;

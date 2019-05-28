@@ -24,24 +24,6 @@ var Foo = /** @class */ (function () {
             }
             container.appendChild(div);
         }
-        // for (var i = 0; i < this.arr.length; i++) {
-        //     var div = document.createElement('div');
-        //     for (var j = 0; j < this.arr[i].length; j++) {
-        //         var span = document.createElement('span');
-        //         span.innerText = this.arr[i][j].toString();
-        //         var is_one = this.arr[i][j]==1;
-        //         if (is_one)
-        //             (<HTMLSpanElement>span).style.backgroundColor = 'black';
-        //         else
-        //             (<HTMLSpanElement>span).style.backgroundColor = 'white';
-        //
-        //
-        //
-        //         div.appendChild(span);
-        //         span.setAttribute('id', this.getID(i, j))
-        //     }
-        //     container.appendChild(div)
-        // }
     };
     Foo.prototype.isVisited = function (i, j) {
         return this.isInBounds(i, j) && this.visited_arr[i][j] == -1;
